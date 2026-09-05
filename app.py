@@ -2,6 +2,7 @@ import streamlit as st
 import os
 from PIL import Image
 from pathlib import Path
+import urllib.request
 from io import BytesIO
 import numpy as np
 import cv2
@@ -14,18 +15,34 @@ from realesrgan import RealESRGANer
 # REAL-ESRGAN (CLOUD / CPU)
 # -----------------------------
 
-MODEL_PATH = Path(__file__).resolve().parent / "weights" / "RealESRGAN_x4plus.pth"
+MODEL_FILENAME = "RealESRGAN_x4plus.pth"
+
+MODEL_URL = (
+    "https://"
+    + "github.com/"
+    + "sajidumar2525-dev/nexora/releases/latest/download/"
+    + MODEL_FILENAME
+)
+
+MODEL_DIR = Path.home() / ".cache" / "nexora"
+MODEL_PATH = MODEL_DIR / MODEL_FILENAME
+
+
+def ensure_model():
+    if MODEL_PATH.exists():
+        return
+
+    MODEL_DIR.mkdir(parents=True, exist_ok=True)
+
+    with st.spinner("Downloading Nexora AI model..."):
+        urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
 
 # Free CPU hosting has limited RAM. Tiling keeps peak inference memory lower.
 TILE_SIZE = 256
 
 @st.cache_resource(show_spinner="Loading Nexora AI model...")
 def load_upsampler():
-    if not MODEL_PATH.exists():
-        raise FileNotFoundError(
-            f"Model not found: {MODEL_PATH}. "
-            "Make sure weights/RealESRGAN_x4plus.pth is included."
-        )
+   ensure_model()
 
     # The x4 model supports arbitrary final output scale through outscale.
     model = RRDBNet(
