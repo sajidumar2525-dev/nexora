@@ -1,0 +1,10 @@
+streamlit
+Pillow
+numpy==1.26.4
+opencv-python-headless==4.10.0.84
+basicsr==1.4.2
+realesrgan==0.3.0
+torch==2.2.2+cpu
+torchvision==0.17.2+cpu
+tqdm
+--extra-index-url https://download.pytorch.org/whl/cpu
