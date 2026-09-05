@@ -42,9 +42,8 @@ TILE_SIZE = 256
 
 @st.cache_resource(show_spinner="Loading Nexora AI model...")
 def load_upsampler():
-   ensure_model()
+    ensure_model()
 
-    # The x4 model supports arbitrary final output scale through outscale.
     model = RRDBNet(
         num_in_ch=3,
         num_out_ch=3,
@@ -54,16 +53,17 @@ def load_upsampler():
         scale=4,
     )
 
-    return RealESRGANer(
+    upsampler = RealESRGANer(
         scale=4,
         model_path=str(MODEL_PATH),
         model=model,
-        tile=TILE_SIZE,
+        tile=256,
         tile_pad=10,
         pre_pad=0,
-        half=False,  # CPU deployment: use FP32 for compatibility
+        half=False,
     )
 
+    return upsampler
 
 def enhance_image(image: Image.Image, scale_value: int) -> bytes:
     """Enhance an RGB PIL image and return PNG bytes."""
